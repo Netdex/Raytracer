@@ -19,12 +19,11 @@ public class Plane implements Intersectable {
 	}
 	
 	public Intersection getIntersection(Ray3 ray) {
-		float denom = planeRay.dir.dot(ray.dir);
+		double denom = planeRay.dir.dot(ray.dir);
 		if(denom < K_EPSILON)
 			return null;
-		Vector3 p0l0 = planeRay.pos.sub(ray.pos);
-		float t = p0l0.dot(planeRay.dir) / denom;
-
-		return new Intersection(ray, this, t, color);
+		Vec3 p0l0 = planeRay.pos.sub(ray.pos);
+		double t = p0l0.dot(planeRay.dir) / denom;
+		return new Intersection(ray, ray.getPoint(t), this, t, color);
 	}
 }

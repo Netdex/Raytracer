@@ -2,10 +2,10 @@ import java.awt.Color;
 
 public abstract class Primitive2D implements Intersectable {
 	
-	private Vector3[] points;
+	private Vec3[] points;
 	private Color color;
 
-	protected Primitive2D(Color color, Vector3... points){
+	protected Primitive2D(Color color, Vec3... points){
 		this(points);
 		this.color = color;
 		this.points = points;
@@ -16,15 +16,15 @@ public abstract class Primitive2D implements Intersectable {
 		this.color = color;
 	}
 
-	protected Primitive2D(Vector3... points){
+	protected Primitive2D(Vec3... points){
 		this.points = points;
 		this.color = Color.WHITE;
 	}
 	
 	protected Primitive2D(int points) {
-		this.points = new Vector3[points];
+		this.points = new Vec3[points];
 		for (int i = 0; i < points; i++)
-			this.points[i] = Vector3.zero();
+			this.points[i] = Vec3.zero();
 		this.color = Color.WHITE;
 	}
 	
@@ -32,7 +32,7 @@ public abstract class Primitive2D implements Intersectable {
 		return color;
 	}
 	
-	public Vector3[] getPoints(){
+	public Vec3[] getPoints(){
 		return points;
 	}
 }
