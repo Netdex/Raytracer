@@ -11,8 +11,9 @@ public class Camera {
 	public static final Vec3 DOWN = new Vec3(0, -1, 0);
 	private static final boolean RENDER_SHADOWS = true;
 	private static final double SHADOW_RENDER_EPSILON = 0.1;
-
+	private static final boolean DITHER = false;
 	private static final double FOV = 1.5;
+	
 	private World world;
 	private Vec3 pos;
 	private Vec3 forward;
@@ -22,8 +23,6 @@ public class Camera {
 
 	private int width;
 	private int height;
-
-	private static final boolean DITHER = true;
 
 	private BufferedImage bufferImage;
 	private int[] renderBuffer;

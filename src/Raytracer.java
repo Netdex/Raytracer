@@ -38,9 +38,8 @@ public class Raytracer extends JFrame {
 
 		private static final double MOUSE_SENSITIVITY = 0.0025f;
 		private static final double MOVE_SPEED = 1.5f;
-
-		private final Point MOUSE_OFFSET = new Point(3, 32);
-
+		private static final int SCALE_FACTOR = 8;
+		
 		private boolean[] KEY_STATE = new boolean[256];
 
 		private boolean pause = false;
@@ -71,7 +70,7 @@ public class Raytracer extends JFrame {
 			world.aRectangle(new Vec3(100, 100, 0), new Vec3(100, 0, 100));
 			
 			world.addIntersect(new Sphere(new Vec3(30, 30, 30), 15));
-			camera = new Camera(world, WIDTH, HEIGHT, WIDTH / 4, HEIGHT / 4, new Vec3(0, 5, 0),
+			camera = new Camera(world, WIDTH, HEIGHT, WIDTH / SCALE_FACTOR, HEIGHT / SCALE_FACTOR, new Vec3(0, 5, 0),
 					new Vec3(1, 0, 0));
 
 			new Thread() {
@@ -122,18 +121,18 @@ public class Raytracer extends JFrame {
 			this.addMouseMotionListener(new MouseMotionAdapter() {
 				public void mouseMoved(MouseEvent event) {
 					Point p = event.getPoint();
-					Point loc = Raytracer.this.getLocationOnScreen();
+					Point loc = RaytracerPanel.this.getLocationOnScreen();
 					Vec3 dir = camera.getDirection();
 					Point center = getCenter();
 					int dx = p.x - center.x;
 					int dy = p.y - center.y;
-
+					
 					if (!pause) {
 						dir.rotateY(MOUSE_SENSITIVITY * dx);
 						dir.rotateAboutAxis(dir.cross(Camera.DOWN), MOUSE_SENSITIVITY * dy);
 						dir.normalize();
-						robot.mouseMove(loc.x + center.x + MOUSE_OFFSET.x,
-								loc.y + center.y + MOUSE_OFFSET.y);
+						robot.mouseMove(loc.x + center.x,
+								loc.y + center.y);
 					}
 				}
 			});
