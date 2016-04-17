@@ -34,6 +34,6 @@ public class Plane implements Intersectable {
 	}
 	
 	public Box getBounds(){
-		return Box.INFINITE;
+		return null;
 	}
 }

@@ -60,8 +60,7 @@ public class World {
 			// Check for preliminary intersection with bounding box for
 			// efficiency
 			Intersection boundIntersect = null;
-			if (bounds.equals(Box.INFINITE)
-					|| ((boundIntersect = bounds.getIntersection(ray)) != null)) {
+			if (bounds == null || ((boundIntersect = bounds.getIntersection(ray)) != null)) {
 				// Check intersection with actual primitive (may be
 				// computationally expensive)
 				Intersection intersect = intersectable.getIntersection(ray);

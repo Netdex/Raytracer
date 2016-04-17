@@ -23,9 +23,7 @@ public class Box extends Primitive3D {
 		if (!(o instanceof Box))
 			return false;
 		Box b = (Box) o;
-		if (bounds[0].equals(b.bounds[0]) && bounds[1].equals(b.bounds[1])
-				|| bounds[0].equals(b.bounds[1])
-				&& bounds[1].equals(b.bounds[0]))
+		if (bounds[0].equals(b.bounds[0]) && bounds[1].equals(b.bounds[1]))
 			return true;
 		return false;
 	}
@@ -67,7 +65,7 @@ public class Box extends Primitive3D {
 	}
 
 	public Box getBounds() {
-		return Box.INFINITE;
+		return null;
 	}
 
 }

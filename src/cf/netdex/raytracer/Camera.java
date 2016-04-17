@@ -16,7 +16,7 @@ public class Camera {
 
 	public static final Vec3 DOWN = new Vec3(0, -1, 0);
 	private static final boolean RENDER_SHADOWS = true;
-	private static final double SHADOW_RENDER_EPSILON = 0.1;
+	private static final double SHADOW_RENDER_EPSILON = 0.01;
 	private static final boolean DITHER = false;
 	private static final double FOV = 1.5;
 	
@@ -61,24 +61,29 @@ public class Camera {
 		Vec3 right = forward.cross(DOWN).getNormalize().mult(FOV);
 		Vec3 up = forward.cross(right).getNormalize().mult(FOV);
 		
-		for (int y = 0; y < height; y += DITHER ? 2 : 1) {
-			for (int x = 0; x < width; x += DITHER ? 2 : 1) {
-				Color color = getTraceColor(new Ray3(pos, getPoint(x, y, right, up)));
-				for (int k = 0; k < buf; k++) {
-					for (int l = 0; l < buf; l++) {
-						renderBuffer[(y * buf + k) * width * buf + (x * buf + l)] = color.getRGB();
+		// Do some interpolation hacks to increase efficiency at the cost of aesthetic
+		if(DITHER){
+			for (int y = 0; y < height; y += 2) {
+				for (int x = 0; x < width; x += 2) {
+					Color color = getTraceColor(new Ray3(pos, getPoint(x, y, right, up)));
+					for (int k = 0; k < buf; k++) {
+						for (int l = 0; l < buf; l++) {
+							renderBuffer[(y * buf + k) * width * buf + (x * buf + l)] = color.getRGB();
+						}
 					}
 				}
 			}
-		}
-
-		// Do some interpolation hacks to increase efficiency at the cost of aesthetic
-		if (DITHER) {
 			for (int y = 0; y < height; y++) {
 				for (int x = 1; x < width - 1; x += 2) {
 					int rgb1 = renderBuffer[(y * buf) * width * buf + ((x - 1) * buf)];
 					int rgb2 = renderBuffer[(y * buf) * width * buf + ((x + 1) * buf)];
-					int avg = getAverageColor(rgb1, rgb2);
+					int avg;
+					if(getColorDifference(rgb1, rgb2) > 50){
+						avg = getTraceColor(new Ray3(pos, getPoint(x, y, right, up))).getRGB();
+					}
+					else{
+						avg = getAverageColor(rgb1, rgb2);
+					}
 					for (int k = 0; k < buf; k++) {
 						for (int l = 0; l < buf; l++) {
 							renderBuffer[(y * buf + k) * width * buf + (x * buf + l)] = avg;
@@ -90,7 +95,13 @@ public class Camera {
 				for (int x = 0; x < width; x++) {
 					int rgb1 = renderBuffer[((y - 1) * buf) * width * buf + (x * buf)];
 					int rgb2 = renderBuffer[((y + 1) * buf) * width * buf + (x * buf)];
-					int avg = getAverageColor(rgb1, rgb2);
+					int avg;
+					if(getColorDifference(rgb1, rgb2) > 50){
+						avg = getTraceColor(new Ray3(pos, getPoint(x, y, right, up))).getRGB();
+					}
+					else{
+						avg = getAverageColor(rgb1, rgb2);
+					}
 					for (int k = 0; k < buf; k++) {
 						for (int l = 0; l < buf; l++) {
 							renderBuffer[(y * buf + k) * width * buf + (x * buf + l)] = avg;
@@ -99,9 +110,32 @@ public class Camera {
 				}
 			}
 		}
+		else{
+			for (int y = 0; y < height; y += 1) {
+				for (int x = 0; x < width; x +=  1) {
+					Color color = getTraceColor(new Ray3(pos, getPoint(x, y, right, up)));
+					for (int k = 0; k < buf; k++) {
+						for (int l = 0; l < buf; l++) {
+							renderBuffer[(y * buf + k) * width * buf + (x * buf + l)] = color.getRGB();
+						}
+					}
+				}
+			}
+		}
+		
 		g.drawImage(bufferImage, 0, 0, null);
 	}
 
+	public double getColorDifference(int a, int b){
+		int r1 = (a >> 16) & 0xFF;
+		int g1 = (a >> 8) & 0xFF;
+		int b1 = a & 0xFF;
+		int r2 = (b >> 16) & 0xFF;
+		int g2 = (b >> 8) & 0xFF;
+		int b2 = b & 0xFF;
+		return Math.sqrt((r2-r1)^2+(g2-g1)^2+(b2-b1)^2);
+	}
+	
 	public int getAverageColor(int a, int b) {
 		int r1 = (a >> 16) & 0xFF;
 		int g1 = (a >> 8) & 0xFF;
@@ -118,7 +152,7 @@ public class Camera {
 	public Color getTraceColor(Ray3 ray) {
 		ArrayList<Intersection> intersections = world.getIntersections(ray);
 		if (intersections.size() == 0)
-			return Color.BLUE;
+			return Color.CYAN;
 
 		Intersection minIntersect = intersections.get(0);
 		Color color = minIntersect.getIntersectionColor();
