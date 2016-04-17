@@ -1,3 +1,5 @@
+package cf.netdex.raytracer;
+
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
@@ -5,6 +7,10 @@ import java.awt.GraphicsEnvironment;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.ArrayList;
+
+import cf.netdex.raytracer.construct.Intersection;
+import cf.netdex.raytracer.construct.Ray3;
+import cf.netdex.raytracer.construct.Vec3;
 
 public class Camera {
 
@@ -50,10 +56,14 @@ public class Camera {
 
 	public void render(Graphics2D g) {
 		int buf = windowWidth / width;
-
+		
+		// Calculate the orientation of the camera
+		Vec3 right = forward.cross(DOWN).getNormalize().mult(FOV);
+		Vec3 up = forward.cross(right).getNormalize().mult(FOV);
+		
 		for (int y = 0; y < height; y += DITHER ? 2 : 1) {
 			for (int x = 0; x < width; x += DITHER ? 2 : 1) {
-				Color color = getTraceColor(new Ray3(pos, getPoint(x, y)));
+				Color color = getTraceColor(new Ray3(pos, getPoint(x, y, right, up)));
 				for (int k = 0; k < buf; k++) {
 					for (int l = 0; l < buf; l++) {
 						renderBuffer[(y * buf + k) * width * buf + (x * buf + l)] = color.getRGB();
@@ -62,6 +72,7 @@ public class Camera {
 			}
 		}
 
+		// Do some interpolation hacks to increase efficiency at the cost of aesthetic
 		if (DITHER) {
 			for (int y = 0; y < height; y++) {
 				for (int x = 1; x < width - 1; x += 2) {
@@ -137,9 +148,7 @@ public class Camera {
 		return -(y - (height / 2.0f)) / (2.0f * height);
 	}
 
-	private Vec3 getPoint(double x, double y) {
-		Vec3 right = forward.cross(DOWN).getNormalize().mult(FOV);
-		Vec3 up = forward.cross(right).getNormalize().mult(FOV);
+	private Vec3 getPoint(double x, double y, Vec3 right, Vec3 up) {
 		Vec3 reright = right.mult(recenterX(x));
 		Vec3 reup = up.mult(recenterY(y));
 		return forward.add(reright).add(reup).getNormalize();

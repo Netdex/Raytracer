@@ -1,4 +1,10 @@
+package cf.netdex.raytracer.primitive;
+
 import java.awt.Color;
+
+import cf.netdex.raytracer.construct.Intersection;
+import cf.netdex.raytracer.construct.Ray3;
+import cf.netdex.raytracer.construct.Vec3;
 
 public class Triangle extends Primitive2D {
 

@@ -1,4 +1,9 @@
+package cf.netdex.raytracer.construct;
+
 import java.awt.Color;
+
+import cf.netdex.raytracer.primitive.Box;
+import cf.netdex.raytracer.primitive.Intersectable;
 
 public class Intersection {
 	

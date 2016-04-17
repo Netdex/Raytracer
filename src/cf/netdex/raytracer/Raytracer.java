@@ -1,3 +1,5 @@
+package cf.netdex.raytracer;
+
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -16,6 +18,13 @@ import java.awt.image.BufferedImage;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import cf.netdex.raytracer.construct.Ray3;
+import cf.netdex.raytracer.construct.Vec3;
+import cf.netdex.raytracer.primitive.Box;
+import cf.netdex.raytracer.primitive.Plane;
+import cf.netdex.raytracer.primitive.Sphere;
+import cf.netdex.raytracer.primitive.Triangle;
+
 public class Raytracer extends JFrame {
 
 	public Raytracer() {
@@ -31,14 +40,14 @@ public class Raytracer extends JFrame {
 		r.setVisible(true);
 	}
 
-	class RaytracerPanel extends JPanel {
+	static class RaytracerPanel extends JPanel {
 
-		public static final int WIDTH = 1200;
-		private static final int HEIGHT = 900;
+		public static final int WIDTH = 1024;
+		private static final int HEIGHT = 768;
 
 		private static final double MOUSE_SENSITIVITY = 0.0025f;
-		private static final double MOVE_SPEED = 1.5f;
-		private static final int SCALE_FACTOR = 8;
+		private static final Vec3 MOVE_SPEED = new Vec3(1.5, 0, 1.5);
+		private static final int SCALE_FACTOR = 4;
 		
 		private boolean[] KEY_STATE = new boolean[256];
 
@@ -70,6 +79,8 @@ public class Raytracer extends JFrame {
 			world.aRectangle(new Vec3(100, 100, 0), new Vec3(100, 0, 100));
 			
 			world.addIntersect(new Sphere(new Vec3(30, 30, 30), 15));
+			for(int i = 0; i < 15; i++)
+			world.addIntersect(new Box(new Vec3(0 + 15 * i,0 + 15 * i,0), new Vec3(10 + 15 * i,10 + 15 * i,10)));
 			camera = new Camera(world, WIDTH, HEIGHT, WIDTH / SCALE_FACTOR, HEIGHT / SCALE_FACTOR, new Vec3(0, 5, 0),
 					new Vec3(1, 0, 0));
 
@@ -78,7 +89,7 @@ public class Raytracer extends JFrame {
 					while (true) {
 						Vec3 dir = camera.getDirection();
 						Vec3 pos = camera.getPosition();
-						Vec3 rot = dir.mult(new Vec3(MOVE_SPEED, 0, MOVE_SPEED)).getNormalize();
+						Vec3 rot = dir.mult(MOVE_SPEED).getNormalize();
 						
 						try {
 							if (KEY_STATE[KeyEvent.VK_W]) {
@@ -92,6 +103,12 @@ public class Raytracer extends JFrame {
 							}
 							if (KEY_STATE[KeyEvent.VK_D]) {
 								pos.set(pos.sub(rot.getRotateY(-(double) (Math.PI / 2))));
+							}
+							if(KEY_STATE[KeyEvent.VK_SPACE]){
+								pos.set(pos.add(new Vec3(0,1,0)));
+							}
+							if(KEY_STATE[KeyEvent.VK_SHIFT]){
+								pos.set(pos.add(new Vec3(0,-1,0)));
 							}
 							
 							repaint();

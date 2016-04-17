@@ -1,4 +1,10 @@
+package cf.netdex.raytracer.primitive;
+
 import java.awt.Color;
+
+import cf.netdex.raytracer.construct.Intersection;
+import cf.netdex.raytracer.construct.Ray3;
+import cf.netdex.raytracer.construct.Vec3;
 
 public class Plane implements Intersectable {
 
@@ -25,5 +31,9 @@ public class Plane implements Intersectable {
 		Vec3 p0l0 = planeRay.pos.sub(ray.pos);
 		double t = p0l0.dot(planeRay.dir) / denom;
 		return new Intersection(ray, ray.getPoint(t), this, t, color);
+	}
+	
+	public Box getBounds(){
+		return Box.INFINITE;
 	}
 }

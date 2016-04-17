@@ -1,20 +1,24 @@
+package cf.netdex.raytracer.primitive;
+
 import java.awt.Color;
 
-public class Sphere implements Intersectable {
+import cf.netdex.raytracer.construct.Intersection;
+import cf.netdex.raytracer.construct.Ray3;
+import cf.netdex.raytracer.construct.Vec3;
+
+public class Sphere extends Primitive3D {
 
 	private Vec3 center;
 	private double radius;
-	private Color color = Color.MAGENTA;
 
 	public Sphere(Vec3 point, double radius) {
+		super(Color.MAGENTA);
 		this.center = point;
 		this.radius = radius;
-	}
-
-	public Sphere(Color color, Vec3 point, double radius) {
-		this.center = point;
-		this.radius = radius;
-		this.color = color;
+		
+		this.bounds =  new Box(new Vec3(center.x - radius, center.y - radius, center.z
+				- radius), new Vec3(center.x + radius, center.y + radius,
+				center.z + radius));
 	}
 
 	@Override
@@ -45,7 +49,7 @@ public class Sphere implements Intersectable {
 
 		double t = t0;
 
-		return new Intersection(ray, ray.getPoint(t), this, t, color);
+		return new Intersection(ray, ray.getPoint(t), this, t, this.getColor());
 	}
 
 	private double[] solveQuadratic(double a, double b, double c) {
@@ -56,7 +60,8 @@ public class Sphere implements Intersectable {
 			double x = 0.5 * b / a;
 			return new double[] { x, x };
 		} else {
-			double q = (b > 0) ? -0.5 * (b + Math.sqrt(discr)) : -0.5 * (b - Math.sqrt(discr));
+			double q = (b > 0) ? -0.5 * (b + Math.sqrt(discr)) : -0.5
+					* (b - Math.sqrt(discr));
 			double x0 = q / a;
 			double x1 = c / q;
 			if (x0 > x1)
@@ -65,4 +70,7 @@ public class Sphere implements Intersectable {
 		}
 	}
 
+	public Box getBounds() {
+		return bounds;
+	}
 }
